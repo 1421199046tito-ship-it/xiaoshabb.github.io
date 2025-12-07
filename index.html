@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>可以跟我和好吗？</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #ffcce6;
+            font-family: "Microsoft YaHei", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+        /* 背景 Hello Kitty 装饰 */
+        .bg-kitty {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .kitty-img {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .title {
+            font-size: 28px;
+            color: #d13369;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .btn {
+            width: 120px;
+            height: 60px;
+            line-height: 60px;
+            text-align: center;
+            font-size: 20px;
+            color: #fff;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            margin: 0 15px;
+            position: relative;
+            z-index: 1;
+        }
+        .accept-btn {
+            background-color: #ff6699;
+        }
+        .reject-btn {
+            background-color: #999;
+            position: absolute;
+            transition: all 0.2s ease;
+            z-index: 1;
+        }
+        .btn-group {
+            position: relative;
+            width: 300px;
+            height: 80px;
+            z-index: 1;
+        }
+        .tip {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #1e90ff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            display: none;
+            z-index: 2;
+        }
+        .final-tip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 102, 153, 0.9);
+            color: #fff;
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 22px;
+            display: none;
+            z-index: 10;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    < img src="https://img.icons8.com/fluency/96/ff6699/hello-kitty.png" alt="Hello Kitty" class="kitty-img">
+    <h1 class="title">可以跟我和好吗？</h1>
+    <div class="btn-group">
+        <button class="btn accept-btn" onclick="agree()">可以</button>
+        <button class="btn reject-btn" id="rejectBtn" onclick="moveRejectBtn()">不可以</button>
+    </div>
+    <div class="tip" id="tip">我会很伤心的😢</div>
+    <div class="final-tip" id="finalTip">没有不可以的选项啦，只能和好～💘</div>
+
+    <script>
+        const rejectBtn = document.getElementById('rejectBtn');
+        const tip = document.getElementById('tip');
+        const finalTip = document.getElementById('finalTip');
+        const btnGroup = document.querySelector('.btn-group');
+        let rejectCount = 0;
+        const maxReject = 5;
+
+        // 生成背景 Hello Kitty 装饰
+        function createBgKitties() {
+            const count = 15; // 背景 Kitty 数量
+            const bodyWidth = document.body.clientWidth;
+            const bodyHeight = document.body.clientHeight;
+            const imgSrc = "https://img.icons8.com/fluency/96/ff6699/hello-kitty.png";
+
+            for(let i = 0; i < count; i++) {
+                const kitty = document.createElement('img');
+                kitty.src = imgSrc;
+                kitty.className = 'bg-kitty';
+                // 随机位置
+                kitty.style.left = `${Math.random() * bodyWidth}px`;
+                kitty.style.top = `${Math.random() * bodyHeight}px`;
+                // 随机旋转角度
+                kitty.style.transform = `rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(kitty);
+            }
+        }
+
+        // 初始化
+        window.onload = function() {
+            createBgKitties();
+            rejectBtn.style.left = '165px';
+            rejectBtn.style.top = '10px';
+        }
+
+        // 同意和好逻辑
+        function agree() {
+            alert('太好了！我们和好了～💖');
+            document.body.style.backgroundColor = "#ff99cc";
+            setTimeout(() => {
+                document.body.style.backgroundColor = "#ffcce6";
+                if (rejectBtn.style.display === 'none') {
+                    rejectBtn.style.display = 'block';
+                    rejectCount = 0;
+                    finalTip.style.display = 'none';
+                }
+            }, 1500);
+        }
+
+        // 不可以按钮移动+消失逻辑
+        function moveRejectBtn() {
+            rejectCount++;
+            tip.style.display = 'block';
+            setTimeout(() => {
+                tip.style.display = 'none';
+            }, 1000);
+
+            if(rejectCount >= maxReject) {
+                rejectBtn.style.display = 'none';
+                finalTip.style.display = 'block';
+                return;
+            }
+
+            const groupRect = btnGroup.getBoundingClientRect();
+            const btnWidth = rejectBtn.offsetWidth;
+            const btnHeight = rejectBtn.offsetHeight;
+            const randomX = Math.random() * (groupRect.width - btnWidth);
+            const randomY = Math.random() * (groupRect.height - btnHeight);
+
+            rejectBtn.style.left = `${randomX}px`;
+            rejectBtn.style.top = `${randomY}px`;
+        }
+    </script>
+</body>
+</html>
